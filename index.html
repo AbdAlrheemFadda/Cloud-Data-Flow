@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Databricks Data Processing Service</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.27.2/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <h1>Cloud Data Processing Service</h1>
+          <p>Powered by Apache Spark & Databricks</p>
+        </div>
+        <nav class="nav">
+          <a href="#" class="nav-link active" onclick="showSection('upload')"
+            >Upload</a
+          >
+          <a href="#" class="nav-link" onclick="showSection('jobs')">Jobs</a>
+          <a href="#" class="nav-link" onclick="showSection('results')"
+            >Results</a
+          >
+          <a href="#" class="nav-link" onclick="showSection('about')">About</a>
+        </nav>
+      </header>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Upload Section -->
+        <section id="upload-section" class="section active">
+          <h2>Upload & Process Dataset</h2>
+
+          <div class="upload-card">
+            <div
+              class="upload-area"
+              id="dropzone"
+              ondrop="handleDrop(event)"
+              ondragover="handleDragOver(event)"
+              ondragleave="handleDragLeave(event)"
+            >
+              <svg class="upload-icon" viewBox="0 0 24 24">
+                <path
+                  d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54h2.13v2.13h1.92v-2.13h2.13L13.96 12.29z"
+                />
+              </svg>
+              <p>Drag and drop your file here or click to select</p>
+              <small>Supported: CSV, JSON, Excel, Parquet, PDF, Text</small>
+              <input
+                type="file"
+                id="file-input"
+                class="file-input"
+                onchange="handleFileSelect(event)"
+              />
+            </div>
+
+            <div id="file-preview" class="file-preview" style="display: none">
+              <div class="preview-item">
+                <span id="preview-filename"></span>
+                <span id="preview-size"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="options">
+            <h3>Processing Options</h3>
+
+            <div class="option-group">
+              <label>
+                <input type="radio" name="job-type" value="stats" checked />
+                Descriptive Statistics
+              </label>
+              <label>
+                <input type="radio" name="job-type" value="ml" />
+                Machine Learning
+              </label>
+              <label>
+                <input type="radio" name="job-type" value="both" />
+                Both (Stats + ML)
+              </label>
+            </div>
+
+            <div class="option-group">
+              <h4>ML Algorithms</h4>
+              <label>
+                <input
+                  type="checkbox"
+                  name="ml-algo"
+                  value="linear_regression"
+                />
+                Linear Regression
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="ml-algo"
+                  value="decision_tree_regression"
+                />
+                Decision Tree Regression
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="ml-algo"
+                  value="kmeans_clustering"
+                />
+                K-Means Clustering
+              </label>
+              <label>
+                <input type="checkbox" name="ml-algo" value="fpgrowth_mining" />
+                Association Mining (FP-Growth)
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="ml-algo"
+                  value="time_series_aggregation"
+                />
+                Time Series Aggregation
+              </label>
+            </div>
+
+            <button class="btn btn-primary" onclick="submitJob()">
+              Submit Job
+            </button>
+          </div>
+        </section>
+
+        <!-- Jobs Section -->
+        <section id="jobs-section" class="section">
+          <h2>Active Jobs</h2>
+
+          <div class="jobs-list" id="jobs-list">
+            <p class="loading">Loading jobs...</p>
+          </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="section">
+          <h2>Results & Analytics</h2>
+
+          <div class="search-bar">
+            <input
+              type="text"
+              id="job-search"
+              placeholder="Search by job ID..."
+            />
+            <button class="btn btn-secondary" onclick="searchResults()">
+              Search
+            </button>
+          </div>
+
+          <div id="results-container">
+            <p class="placeholder">
+              No results selected. Search for a job or check completed jobs
+              above.
+            </p>
+          </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about-section" class="section">
+          <h2>About This Service</h2>
+
+          <div class="info-card">
+            <h3>Cloud-Based Distributed Data Processing</h3>
+            <p>
+              This service leverages Apache Spark and Databricks to perform
+              scalable, distributed processing of large datasets.
+            </p>
+
+            <h4>Features:</h4>
+            <ul>
+              <li>
+                <strong>Descriptive Statistics:</strong> Comprehensive data
+                analysis including missing data patterns
+              </li>
+              <li>
+                <strong>Machine Learning:</strong> Multiple algorithms for
+                regression, clustering, and pattern mining
+              </li>
+              <li>
+                <strong>Scalability:</strong> Dynamic cluster sizing for optimal
+                performance
+              </li>
+              <li>
+                <strong>Cloud Storage:</strong> Integrated with DBFS and cloud
+                providers
+              </li>
+              <li>
+                <strong>Real-time Monitoring:</strong> Track job progress and
+                view results
+              </li>
+            </ul>
+
+            <h4>Supported File Formats:</h4>
+            <ul>
+              <li>CSV (Comma-Separated Values)</li>
+              <li>JSON (JavaScript Object Notation)</li>
+              <li>Excel (.xlsx, .xls)</li>
+              <li>Parquet (Apache Parquet)</li>
+              <li>Text Files</li>
+              <li>PDF Documents</li>
+            </ul>
+
+            <h4>ML Algorithms:</h4>
+            <ul>
+              <li>
+                <strong>Regression:</strong> Linear Regression, Decision Tree
+                Regression
+              </li>
+              <li><strong>Clustering:</strong> K-Means</li>
+              <li>
+                <strong>Pattern Mining:</strong> FP-Growth Association Rules
+              </li>
+              <li><strong>Time Series:</strong> Temporal Aggregation</li>
+            </ul>
+          </div>
+        </section>
+      </main>
+
+      <!-- Status Bar -->
+      <footer class="status-bar">
+        <span id="status-message">Ready</span>
+        <span id="status-indicator" class="indicator"></span>
+      </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>
