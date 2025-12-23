@@ -1,66 +1,52 @@
-/* Main JavaScript Application */
+
 
 const API_BASE_URL = "http://localhost:5000/api";
 let currentFileId = null;
 
-// Initialize on page load
 document.addEventListener("DOMContentLoaded", function () {
   checkHealth();
   loadJobs();
 });
 
-// Section Navigation
 function showSection(sectionName) {
-  // Hide all sections
+  
   document.querySelectorAll(".section").forEach((section) => {
     section.classList.remove("active");
   });
-
-  // Remove active class from all nav links
   document.querySelectorAll(".nav-link").forEach((link) => {
     link.classList.remove("active");
   });
-
-  // Show selected section
   const sectionId = `${sectionName}-section`;
   const section = document.getElementById(sectionId);
   if (section) {
     section.classList.add("active");
   }
 
-  // Add active class to clicked nav link
   event.target.classList.add("active");
-
-  // Load data if needed
   if (sectionName === "jobs") {
     loadJobs();
   }
 }
 
-// File Upload Handlers
 function handleDragOver(e) {
   e.preventDefault();
   e.stopPropagation();
   document.getElementById("dropzone").classList.add("drag-over");
 }
-
 function handleDragLeave(e) {
   e.preventDefault();
   e.stopPropagation();
   document.getElementById("dropzone").classList.remove("drag-over");
 }
-
 function handleDrop(e) {
   e.preventDefault();
   e.stopPropagation();
   document.getElementById("dropzone").classList.remove("drag-over");
-
   const files = e.dataTransfer.files;
   if (files.length > 0) {
     handleFileSelect({ target: { files } });
   }
 }
-
 function handleFileSelect(e) {
   const files = e.target.files;
   if (files.length > 0) {
@@ -68,7 +54,6 @@ function handleFileSelect(e) {
     displayFilePreview(file);
   }
 }
-
 function displayFilePreview(file) {
   const fileSize = (file.size / 1024 / 1024).toFixed(2);
   document.getElementById("preview-filename").textContent = file.name;
@@ -82,8 +67,7 @@ function displayFilePreview(file) {
 function generateFileId() {
   return "file_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 }
-
-// Job Submission
+// ^-_-^
 async function submitJob() {
   const fileInput = document.getElementById("file-input");
   const file = fileInput.files[0];
@@ -130,7 +114,6 @@ async function submitJob() {
 
     const jobId = jobResponse.data.job_id;
     updateStatus(`Job submitted: ${jobId}`, "success");
-
     // Clear form
     document.getElementById("file-input").value = "";
     document.getElementById("file-preview").style.display = "none";
@@ -143,13 +126,11 @@ async function submitJob() {
     updateStatus("Error submitting job: " + error.message, "error");
   }
 }
-
 // Load jobs
 async function loadJobs() {
   try {
     const response = await axios.get(`${API_BASE_URL}/jobs/list`);
     const jobs = response.data.jobs || [];
-
     const jobsList = document.getElementById("jobs-list");
 
     if (jobs.length === 0) {
@@ -188,7 +169,7 @@ async function loadJobs() {
   }
 }
 
-// View Results
+// View Result
 async function viewResults(jobId) {
   try {
     updateStatus("Loading results...", "info");
@@ -248,7 +229,6 @@ function displayStats(stats) {
             </div>
         `;
   }
-
   if (stats.numerical_stats) {
     html +=
       '<h5>Numerical Statistics</h5><table class="result-table"><tr><th>Column</th><th>Min</th><th>Max</th><th>Mean</th></tr>';
@@ -264,7 +244,6 @@ function displayStats(stats) {
     }
     html += "</table>";
   }
-
   return html;
 }
 
@@ -304,7 +283,7 @@ function displayMLResults(mlResults) {
   return html;
 }
 
-// Search results
+// Search result
 async function searchResults() {
   const jobId = document.getElementById("job-search").value;
 
@@ -316,7 +295,7 @@ async function searchResults() {
   viewResults(jobId);
 }
 
-// Download results
+// Download result
 async function downloadResults(jobId) {
   try {
     const format = prompt("Download format (json, csv, excel, pdf):", "json");
@@ -329,7 +308,7 @@ async function downloadResults(jobId) {
         responseType: "blob",
       }
     );
-
+// what else
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
     link.href = url;
@@ -354,7 +333,6 @@ async function checkHealth() {
   }
 }
 
-// Status updates
 function updateStatus(message, type = "info") {
   const statusEl = document.getElementById("status-message");
   const indicatorEl = document.getElementById("status-indicator");
@@ -372,3 +350,4 @@ function updateStatus(message, type = "info") {
 
   console.log(`[${type.toUpperCase()}] ${message}`);
 }
+
