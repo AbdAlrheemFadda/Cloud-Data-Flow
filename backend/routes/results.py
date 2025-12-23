@@ -34,10 +34,8 @@ def get_results(job_id):
 def download_results(job_id):
     """
     Download results as a file
-    
     Query Parameters:
         - format: Output format (json, csv, excel, pdf) - default: json
-    
     Response:
         - File download
     """
@@ -49,7 +47,7 @@ def download_results(job_id):
         
         file_path = results_service.export_results(job_id, file_format)
         return send_file(file_path, as_attachment=True)
-        
+        #راجعها تنساش
     except Exception as e:
         logger.error(f'Export error: {str(e)}')
         return jsonify({'error': 'Export failed', 'message': str(e)}), 500
@@ -57,8 +55,7 @@ def download_results(job_id):
 @results_bp.route('/<job_id>/stats', methods=['GET'])
 def get_stats_results(job_id):
     """
-    Get only descriptive statistics results
-    
+    Get only descriptive statistics results 
     Response:
         - job_id: Job identifier
         - stats: Descriptive statistics
@@ -78,7 +75,6 @@ def get_stats_results(job_id):
 def get_ml_results(job_id):
     """
     Get only ML job results
-    
     Response:
         - job_id: Job identifier
         - ml_results: ML job results
@@ -90,7 +86,7 @@ def get_ml_results(job_id):
             'job_id': job_id,
             'ml_results': ml_results
         }), 200
-        
+        #^-_-^
     except Exception as e:
         logger.error(f'ML results retrieval error: {str(e)}')
         return jsonify({'error': 'ML results retrieval failed', 'message': str(e)}), 500
@@ -99,7 +95,6 @@ def get_ml_results(job_id):
 def get_results_summary(job_id):
     """
     Get a summary of results
-    
     Response:
         - job_id: Job identifier
         - summary: Results summary
@@ -113,3 +108,5 @@ def get_results_summary(job_id):
     except Exception as e:
         logger.error(f'Summary retrieval error: {str(e)}')
         return jsonify({'error': 'Summary retrieval failed', 'message': str(e)}), 500
+        
+
