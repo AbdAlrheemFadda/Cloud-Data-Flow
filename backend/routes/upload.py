@@ -11,8 +11,8 @@ from services.upload_service import UploadService
 logger = logging.getLogger(__name__)
 upload_bp = Blueprint('upload', __name__, url_prefix='/api')
 
-# Allowed file extensions
-ALLOWED_EXTENSIONS = {'csv', 'json', 'txt', 'pdf', 'xlsx', 'xls', 'parquet'}
+
+ALLOWED_EXTENSIONS = {'csv', 'json', 'txt', 'pdf'}
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
@@ -22,11 +22,9 @@ def allowed_file(filename):
 def upload_file():
     """
     Upload a dataset file
-    
     Request:
         - file: The file to upload
         - job_type: Type of jobs to run (stats, ml, both)
-    
     Response:
         - file_id: Unique identifier for uploaded file
         - filename: Original filename
@@ -34,7 +32,7 @@ def upload_file():
         - timestamp: Upload timestamp
     """
     try:
-        # Check if file is in request
+
         if 'file' not in request.files:
             return jsonify({'error': 'No file provided'}), 400
         
@@ -49,15 +47,13 @@ def upload_file():
                 'error': 'File type not allowed',
                 'allowed_types': list(ALLOWED_EXTENSIONS)
             }), 400
-        
-        # Validate job type
+    
         if job_type not in ['stats', 'ml', 'both']:
             return jsonify({
                 'error': 'Invalid job_type',
                 'allowed_types': ['stats', 'ml', 'both']
             }), 400
         
-        # Secure filename and save
         filename = secure_filename(file.filename)
         upload_service = UploadService()
         
@@ -69,7 +65,7 @@ def upload_file():
         
         logger.info(f'File uploaded successfully: {filename}')
         return jsonify(result), 200
-        
+        #^-_-^
     except Exception as e:
         logger.error(f'Upload error: {str(e)}')
         return jsonify({'error': 'Upload failed', 'message': str(e)}), 500
