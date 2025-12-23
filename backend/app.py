@@ -1,5 +1,5 @@
 """
-Flask Backend Application for Databricks Data Processing Service
+Flask backend Application for Databricks Data Processing Service
 Main entry point for the web service
 """
 
@@ -8,30 +8,23 @@ import logging
 from dotenv import load_dotenv
 from flask import Flask, jsonify
 from flask_cors import CORS
-
-# Load environment variables
 load_dotenv()
 
-# Configure logging
 logging.basicConfig(
     level=os.getenv('LOG_LEVEL', 'INFO'),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
-# Configuration
 app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_UPLOAD_SIZE', 5368709120))
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'uploads')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
 
-# Create upload folder if it doesn't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Import and register blueprints
 from routes.upload import upload_bp
 from routes.jobs import jobs_bp
 from routes.results import results_bp
@@ -78,3 +71,4 @@ if __name__ == '__main__':
         port=port,
         debug=debug
     )
+
