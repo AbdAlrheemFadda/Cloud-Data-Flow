@@ -17,12 +17,10 @@ databricks_service = DatabricksService()
 def submit_job():
     """
     Submit a processing job to Databricks
-    
     Request:
         - file_id: ID of uploaded file
         - job_type: Type of job (stats, ml, both)
         - ml_algorithms: List of ML algorithms to run
-    
     Response:
         - job_id: Unique job identifier
         - status: Job status (submitted)
@@ -37,10 +35,8 @@ def submit_job():
         job_type = data.get('job_type', 'both')
         ml_algorithms = data.get('ml_algorithms', [])
         
-        # Generate job ID
         job_id = str(uuid.uuid4())
         
-        # Submit job to Databricks
         result = job_service.submit_job(
             job_id=job_id,
             file_id=data['file_id'],
@@ -126,7 +122,6 @@ def list_jobs():
 def get_job_logs(job_id):
     """
     Get logs for a job
-    
     Response:
         - job_id: Job identifier
         - logs: Job execution logs
