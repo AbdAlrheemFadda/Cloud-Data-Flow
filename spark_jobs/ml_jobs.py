@@ -30,27 +30,21 @@ class LinearRegressionJob:
         start_time = time.time()
         
         try:
-            # Prepare features
-            assembler = VectorAssembler(inputCols=feature_cols, outputCol="features")
+            
+            assembler = vectorAssembler(inputCols=feature_cols, outputCol="features")
             df_assembled = assembler.transform(df)
             
-            # Split data
             train_data, test_data = df_assembled.randomSplit([0.8, 0.2], seed=42)
             
-            # Train model
-            lr = LinearRegression(labelCol=label_col, featuresCol="features")
+            lr = linearRegression(labelCol=label_col, featuresCol="features")
             model = lr.fit(train_data)
-            
-            # Make predictions
             predictions = model.transform(test_data)
             
-            # Evaluate
-            evaluator = RegressionEvaluator(labelCol=label_col, predictionCol="prediction", metricName="rmse")
+            evaluator = regressionEvaluator(labelCol=label_col, predictionCol="prediction", metricName="rmse")
             rmse = evaluator.evaluate(predictions)
             
-            r2_evaluator = RegressionEvaluator(labelCol=label_col, predictionCol="prediction", metricName="r2")
+            r2_evaluator = regressionEvaluator(labelCol=label_col, predictionCol="prediction", metricName="r2")
             r2 = r2_evaluator.evaluate(predictions)
-            
             execution_time = time.time() - start_time
             
             return {
@@ -67,8 +61,8 @@ class LinearRegressionJob:
             }
         except Exception as e:
             return {'algorithm': 'linear_regression', 'error': str(e)}
-
-class DecisionTreeRegressionJob:
+ #^-_-^
+class decisionTreeRegressionJob:
     """Decision Tree Regression ML Job"""
     
     @staticmethod
@@ -77,25 +71,21 @@ class DecisionTreeRegressionJob:
         start_time = time.time()
         
         try:
-            # Prepare features
-            assembler = VectorAssembler(inputCols=feature_cols, outputCol="features")
+            
+            assembler = vectorAssembler(inputCols=feature_cols, outputCol="features")
             df_assembled = assembler.transform(df)
             
-            # Split data
             train_data, test_data = df_assembled.randomSplit([0.8, 0.2], seed=42)
             
-            # Train model
-            dt = DecisionTreeRegressor(labelCol=label_col, featuresCol="features")
+            dt = decisionTreeRegressor(labelCol=label_col, featuresCol="features")
             model = dt.fit(train_data)
             
-            # Make predictions
             predictions = model.transform(test_data)
             
-            # Evaluate
-            evaluator = RegressionEvaluator(labelCol=label_col, predictionCol="prediction", metricName="rmse")
+            evaluator = regressionEvaluator(labelCol=label_col, predictionCol="prediction", metricName="rmse")
             rmse = evaluator.evaluate(predictions)
             
-            r2_evaluator = RegressionEvaluator(labelCol=label_col, predictionCol="prediction", metricName="r2")
+            r2_evaluator = regressionEvaluator(labelCol=label_col, predictionCol="prediction", metricName="r2")
             r2 = r2_evaluator.evaluate(predictions)
             
             execution_time = time.time() - start_time
@@ -114,7 +104,7 @@ class DecisionTreeRegressionJob:
             }
         except Exception as e:
             return {'algorithm': 'decision_tree_regression', 'error': str(e)}
-
+ #^-_-^
 class KMeansClusteringJob:
     """K-Means Clustering ML Job"""
     
@@ -124,26 +114,21 @@ class KMeansClusteringJob:
         start_time = time.time()
         
         try:
-            # Prepare features
-            assembler = VectorAssembler(inputCols=feature_cols, outputCol="features")
+            
+            assembler = vectorAssembler(inputCols=feature_cols, outputCol="features")
             df_assembled = assembler.transform(df)
             
-            # Standardize features
-            scaler = StandardScaler(inputCol="features", outputCol="scaled_features")
+            scaler = standardScaler(inputCol="features", outputCol="scaled_features")
             df_scaled = scaler.fit(df_assembled).transform(df_assembled)
             
-            # Train model
             kmeans = KMeans(k=k, seed=42, featuresCol="scaled_features")
             model = kmeans.fit(df_scaled)
             
-            # Get predictions
             predictions = model.transform(df_scaled)
-            
-            # Calculate silhouette score
-            evaluator = ClusteringEvaluator(featuresCol="scaled_features", predictionCol="prediction")
+        
+            evaluator = clusteringEvaluator(featuresCol="scaled_features", predictionCol="prediction")
             silhouette = evaluator.evaluate(predictions)
             
-            # Get cluster sizes
             cluster_sizes = predictions.groupBy("prediction").count().collect()
             cluster_distribution = {int(row["prediction"]): int(row["count"]) for row in cluster_sizes}
             
@@ -172,11 +157,11 @@ class TimeSeriesAggregationJob:
         start_time = time.time()
         
         try:
-            # Validate columns exist
-            if timestamp_col not in df.columns or value_col not in df.columns:
-                raise ValueError(f"Columns {timestamp_col} or {value_col} not found")
             
-            # Convert timestamp if needed
+            if timestamp_col not in df.columns or value_col not in df.columns:
+                raise valueError(f"Columns {timestamp_col} or {value_col} not found")
+            
+            
             if freq == 'daily':
                 df_ts = df.groupBy(F.to_date(F.col(timestamp_col)).alias("date")).agg(
                     F.sum(value_col).alias("sum"),
@@ -205,7 +190,7 @@ class TimeSeriesAggregationJob:
                 ).orderBy("month")
             
             else:
-                raise ValueError(f"Unknown frequency: {freq}")
+                raise valueError(f"Unknown frequency: {freq}")
             
             results_list = df_ts.collect()
             results_data = [row.asDict() for row in results_list]
@@ -233,16 +218,14 @@ class FPGrowthMiningJob:
         start_time = time.time()
         
         try:
-            # Convert to RDD format for FPGrowth
+            
             transactions = df.select(transactions_col).rdd.map(lambda x: x[0].split(',') if isinstance(x[0], str) else [str(x[0])])
             
-            # Run FPGrowth
             model = FPGrowth.train(transactions, minSupport=min_support)
             
-            # Get frequent itemsets
             frequent_itemsets = model.freqItemsets().collect()
             itemsets_list = []
-            for itemset in frequent_itemsets[:50]:  # Limit to top 50
+            for itemset in frequent_itemsets[:50]:  
                 itemsets_list.append({
                     'items': list(itemset.items),
                     'frequency': int(itemset.freq)
@@ -270,7 +253,7 @@ def run_ml_jobs(file_path, algorithms_str):
     spark = create_spark_session()
     
     try:
-        # Load data
+        
         if file_path.endswith('.csv'):
             df = spark.read.option("header", "true").csv(file_path)
         elif file_path.endswith('.json'):
